@@ -1,0 +1,52 @@
+---
+title: "Course Project One"
+author: "Justin Bartee"
+date: "June 19, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Summary
+
+This document is composed of the analysis and figures meeting the requirements for submission for the Course Project One assignment.
+
+## Data
+Data from the accompanying "activity.zip" file are loaded:
+
+```{r}
+activitydata <- read.csv(unz("activity.zip", "activity.csv"))
+activitydata$date <- as.Date(activitydata$date)
+```
+
+## Analysis of Steps Per Day
+
+We examine the data aggregated by day, specifically mean and median values, ignoring missing values:
+```{r}
+dailysteps <- aggregate(steps ~ date, data=activitydata, FUN=sum, na.action = na.omit)
+meandaily <- mean(dailysteps$steps)
+mediandaily <- median(dailysteps$steps)
+```
+
+The mean is `r format(meandaily[1],scientific=FALSE)`.
+The median is `r mediandaily[1]`.
+
+
+A histogram of the daily step count provides some insight into this:
+```{r}
+dailyhist <- qplot(dailysteps$steps, 
+                   geom="histogram",
+                   fill=I("lightblue"),
+                   col=I("red"),
+                   binwidth=5000,
+                   main = "Daily Steps Histogram",
+                   xlab = "Steps",
+                   ylab = "Days") +
+  geom_vline(xintercept=meandaily,color="yellow") +
+  geom_vline(xintercept=mediandaily,color="black")
+dailyhist
+```
+
