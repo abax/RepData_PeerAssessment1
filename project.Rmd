@@ -32,10 +32,11 @@ mediandaily <- median(dailysteps$steps)
 ```
 
 The mean is `r format(meandaily[1],scientific=FALSE)`.
+
 The median is `r mediandaily[1]`.
 
 
-A histogram of the daily step count provides some insight into this:
+A histogram of the daily step count may provide additional insight into this:
 ```{r}
 dailyhist <- qplot(dailysteps$steps, 
                    geom="histogram",
@@ -50,3 +51,35 @@ dailyhist <- qplot(dailysteps$steps,
 dailyhist
 ```
 
+The median and mean are quite close, almost overlapping, as shown on the plot by the vertical lines.
+
+
+## Time Series
+
+We might gain additional insight by examining the time series for various intervals. For this project, the 5-minute interval is chosen.
+
+We acquire the intervals by aggregation, ignoring missing values:
+```{r}
+intervalsteps <- aggregate(steps ~ interval, data=activitydata, FUN=mean)
+```
+
+And examine a plot of the time series:
+
+```{r}
+intervalplot <- ggplot(intervalsteps, aes(interval, steps)) +
+  geom_line() +
+  xlab("Interval") +
+  ylab("Steps (mean per day)")
+intervalplot
+```
+
+We compute some information related to the interval with the maximum value:
+```{r}
+maxindex <- which(intervalsteps$steps == max(intervalsteps$steps))
+intervalmax <- intervalsteps$interval[maxindex]
+maxsteps <- intervalsteps$steps[maxindex]
+intervalhour <- floor(intervalmax / 60) + 1
+```
+We see that the interval with the maximum value is `r intervalmax` (hour `r intervalhour`). The maximum average steps taken during this interval is about `r floor(maxsteps)`. 
+
+## Handling Missing Data
