@@ -83,3 +83,42 @@ intervalhour <- floor(intervalmax / 60) + 1
 We see that the interval with the maximum value is `r intervalmax` (hour `r intervalhour`). The maximum average steps taken during this interval is about `r floor(maxsteps)`. 
 
 ## Handling Missing Data
+```{r}
+rowsWithMissing <- activitydata$steps[is.na(activitydata$steps)]
+```
+There are `r length(rowsWithMissing)` rows with missing values for steps. We impute the missing values by taking the mean of all steps values:
+
+```{r}
+meanSteps <- floor(mean(activitydata$steps, na.rm=TRUE))
+imputedData <- cbind(activitydata)
+imputedData$steps[is.na(imputedData$steps)] <- meanSteps
+```
+
+We now examine the results:
+
+```{r}
+imputedDailySteps <- aggregate(steps ~ date, data=imputedData, FUN=sum)
+meandaily <- mean(imputedDailySteps$steps)
+mediandaily <- median(imputedDailySteps$steps)
+```
+
+The mean is `r format(meandaily[1],scientific=FALSE)`.
+
+The median is `r format(mediandaily[1], scientific=FALSE)`.
+
+
+A histogram of the daily step count may provide additional insight into this:
+```{r}
+imputedhist <- qplot(imputedDailySteps$steps, 
+                   geom="histogram",
+                   fill=I("lightblue"),
+                   col=I("red"),
+                   binwidth=5000,
+                   main = "Daily Steps Histogram",
+                   xlab = "Steps",
+                   ylab = "Days") +
+  geom_vline(xintercept=meandaily,color="yellow") +
+  geom_vline(xintercept=mediandaily,color="black")
+imputedhist
+```
+
